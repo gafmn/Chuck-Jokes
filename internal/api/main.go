@@ -15,6 +15,7 @@ type JokeData struct {
 }
 
 func GetRandomJoke() (string, error) {
+	// Fetch random joke from API
 	response, err := http.Get("https://api.chucknorris.io/jokes/random")
 	if err != nil {
 		fmt.Println(err.Error())
@@ -25,11 +26,14 @@ func GetRandomJoke() (string, error) {
 		return "", fmt.Errorf("Failed to get random joke")
 	}
 
+	// Get body of response on success
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println(err.Error())
+		return "", err
 	}
 
+	// Parse body
 	var jokeData JokeData
 	json.Unmarshal([]byte(body), &jokeData)
 
@@ -37,8 +41,8 @@ func GetRandomJoke() (string, error) {
 }
 
 func GetCategoryList() ([]string, error) {
+	// Fetch all categories
 	response, err := http.Get("https://api.chucknorris.io/jokes/categories")
-
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
@@ -48,11 +52,14 @@ func GetCategoryList() ([]string, error) {
 		return nil, fmt.Errorf("Failed to get list of categories")
 	}
 
+	// Get body of response on success
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
 	}
+
+	// Parse body
 	var categories []string
 	json.Unmarshal([]byte(body), &categories)
 
@@ -60,6 +67,9 @@ func GetCategoryList() ([]string, error) {
 }
 
 func GetCategoryRandomJoke(category string) (*JokeData, error) {
+	// Fetch random joke by category
+
+	// Geneerate query param for joke request
 	request, _ := http.NewRequest("GET", "https://api.chucknorris.io/jokes/random", nil)
 	query := request.URL.Query()
 	query.Add("category", category)
@@ -75,12 +85,14 @@ func GetCategoryRandomJoke(category string) (*JokeData, error) {
 		return nil, fmt.Errorf("Failed get joke of category %v", category)
 	}
 
+	// Get body of response on success
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
 	}
 
+	// Parse body
 	var jokeData JokeData
 	json.Unmarshal([]byte(body), &jokeData)
 
