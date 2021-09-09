@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 type JokeData struct {
@@ -14,11 +15,16 @@ type JokeData struct {
 	Value   string
 }
 
+var URL = "https://api.chucknorris.io/jokes"
+
 func GetRandomJoke() (string, error) {
 	// Fetch random joke from API
-	response, err := http.Get("https://api.chucknorris.io/jokes/random")
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	response, err := client.Get(URL + "/random")
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		return "", err
 	}
 
@@ -29,22 +35,28 @@ func GetRandomJoke() (string, error) {
 	// Get body of response on success
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		return "", err
 	}
 
 	// Parse body
 	var jokeData JokeData
-	json.Unmarshal([]byte(body), &jokeData)
+	if err := json.Unmarshal([]byte(body), &jokeData); err != nil {
+		fmt.Println(err)
+		return "", err
+	}
 
 	return jokeData.Value, nil
 }
 
 func GetCategoryList() ([]string, error) {
 	// Fetch all categories
-	response, err := http.Get("https://api.chucknorris.io/jokes/categories")
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	response, err := client.Get(URL + "/categories")
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -55,13 +67,16 @@ func GetCategoryList() ([]string, error) {
 	// Get body of response on success
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		return nil, err
 	}
 
 	// Parse body
 	var categories []string
-	json.Unmarshal([]byte(body), &categories)
+	if err := json.Unmarshal([]byte(body), &categories); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 
 	return categories, nil
 }
@@ -70,14 +85,17 @@ func GetCategoryRandomJoke(category string) (*JokeData, error) {
 	// Fetch random joke by category
 
 	// Geneerate query param for joke request
-	request, _ := http.NewRequest("GET", "https://api.chucknorris.io/jokes/random", nil)
+	request, _ := http.NewRequest("GET", URL+"/random", nil)
 	query := request.URL.Query()
 	query.Add("category", category)
 	request.URL.RawQuery = query.Encode()
 
-	response, err := http.Get(request.URL.String())
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	response, err := client.Get(request.URL.String())
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		return nil, err
 	}
 
@@ -88,13 +106,16 @@ func GetCategoryRandomJoke(category string) (*JokeData, error) {
 	// Get body of response on success
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		return nil, err
 	}
 
 	// Parse body
 	var jokeData JokeData
-	json.Unmarshal([]byte(body), &jokeData)
+	if err := json.Unmarshal([]byte(body), &jokeData); err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
 
 	return &jokeData, nil
 }

@@ -4,6 +4,7 @@ import (
 	"chucknorris/internal/api"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"sync"
 )
@@ -18,8 +19,7 @@ func main() {
 
 	// Check correct amount subcommands
 	if len(os.Args) < 2 {
-		fmt.Println("Expected commands `random` and `dump`")
-		os.Exit(1)
+		log.Fatal("Expected commands `random` and `dump`")
 	}
 
 	// Check what command
@@ -43,16 +43,14 @@ func main() {
 
 	default:
 		// Case in incorrect commands
-		fmt.Println("Expected commands `random` and `dump`")
-		os.Exit(1)
+		log.Fatal("Expected commands `random` and `dump`")
 	}
 }
 
 func checkError(err error) {
 	// Check occurance of error
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
 
@@ -82,7 +80,7 @@ func saveCategory(category string, n int, wg *sync.WaitGroup) {
 		jokeData, err := api.GetCategoryRandomJoke(category)
 
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Println(err)
 		}
 
 		// Check uniqueness
@@ -95,17 +93,17 @@ func saveCategory(category string, n int, wg *sync.WaitGroup) {
 			break
 		}
 
-		// Update data
 		retryNumber = 0
 		jokes[jokeData.Id] = *jokeData
 	}
 
 	// Create file `category`.txt
 	file, err := os.Create(category + ".txt")
-	defer file.Close()
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
+		return
 	}
+	defer file.Close()
 
 	// Write jokes to file
 	for _, jokeData := range jokes {
