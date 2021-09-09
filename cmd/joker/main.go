@@ -11,7 +11,6 @@ import (
 
 // Entrypoint of program
 func main() {
-	_ = flag.NewFlagSet("random", flag.ExitOnError)
 
 	// Provide number of jokes to be dumped to files
 	dumpCmd := flag.NewFlagSet("dump", flag.ExitOnError)
