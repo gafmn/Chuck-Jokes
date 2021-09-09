@@ -17,8 +17,8 @@ type JokeData struct {
 
 var URL = "https://api.chucknorris.io/jokes"
 
+// Fetch random joke from API
 func GetRandomJoke() (string, error) {
-	// Fetch random joke from API
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
@@ -39,7 +39,6 @@ func GetRandomJoke() (string, error) {
 		return "", err
 	}
 
-	// Parse body
 	var jokeData JokeData
 	if err := json.Unmarshal([]byte(body), &jokeData); err != nil {
 		fmt.Println(err)
@@ -49,8 +48,8 @@ func GetRandomJoke() (string, error) {
 	return jokeData.Value, nil
 }
 
+// Fetch all categories
 func GetCategoryList() ([]string, error) {
-	// Fetch all categories
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
@@ -71,7 +70,6 @@ func GetCategoryList() ([]string, error) {
 		return nil, err
 	}
 
-	// Parse body
 	var categories []string
 	if err := json.Unmarshal([]byte(body), &categories); err != nil {
 		fmt.Println(err)
@@ -81,8 +79,8 @@ func GetCategoryList() ([]string, error) {
 	return categories, nil
 }
 
+// Fetch random joke by category
 func GetCategoryRandomJoke(category string) (*JokeData, error) {
-	// Fetch random joke by category
 
 	// Geneerate query param for joke request
 	request, _ := http.NewRequest("GET", URL+"/random", nil)
@@ -110,7 +108,6 @@ func GetCategoryRandomJoke(category string) (*JokeData, error) {
 		return nil, err
 	}
 
-	// Parse body
 	var jokeData JokeData
 	if err := json.Unmarshal([]byte(body), &jokeData); err != nil {
 		fmt.Println(err)

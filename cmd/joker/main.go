@@ -9,8 +9,8 @@ import (
 	"sync"
 )
 
+// Entrypoint of program
 func main() {
-	// Entrypoint of program
 	_ = flag.NewFlagSet("random", flag.ExitOnError)
 
 	// Provide number of jokes to be dumped to files
@@ -34,31 +34,27 @@ func main() {
 	case "dump":
 		dumpCmd.Parse(os.Args[2:])
 
-		// Get all categories
 		categories, err := api.GetCategoryList()
 		checkError(err)
 
-		// Save n jokes of categories
 		saveNJokes(categories, *dumpNumber)
 
 	default:
-		// Case in incorrect commands
 		log.Fatal("Expected commands `random` and `dump`")
 	}
 }
 
+// Check occurance of error
 func checkError(err error) {
-	// Check occurance of error
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
+// Save N jokes from all categories
 func saveNJokes(categories []string, n int) {
-	// Save N jokes from all categories
 	var wg sync.WaitGroup
 
-	// Iterate over categories and fetch random jokes
 	for _, category := range categories {
 		wg.Add(1)
 		go saveCategory(category, n, &wg)
@@ -67,8 +63,8 @@ func saveNJokes(categories []string, n int) {
 	wg.Wait()
 }
 
+// Save category jokes to file
 func saveCategory(category string, n int, wg *sync.WaitGroup) {
-	// Save category jokes to file
 	defer wg.Done()
 
 	// Declare map of jokes and number of tries to get random joke of category
@@ -76,7 +72,6 @@ func saveCategory(category string, n int, wg *sync.WaitGroup) {
 	retryNumber := 0
 
 	for len(jokes) < n {
-		// Fetch random joke of category
 		jokeData, err := api.GetCategoryRandomJoke(category)
 
 		if err != nil {
